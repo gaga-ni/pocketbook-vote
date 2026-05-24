@@ -50,7 +50,7 @@ export default async function CandidateDetailPage({
         {/* Top row: 4 identity fields + photo */}
         <div className="flex flex-row">
           {/* Left: 기호 / name / election label / party badge */}
-          <div className="flex-[3] py-2 pr-4 flex flex-col gap-2 min-w-0">
+          <div className="flex-1 py-2 pr-4 flex flex-col gap-2 min-w-0">
             <span className="text-[14px] font-medium leading-[20px] text-body">
               기호 {candidate.giho}
             </span>
@@ -66,13 +66,15 @@ export default async function CandidateDetailPage({
             )}
           </div>
 
-          {/* Right: photo — stretches to match left height */}
-          <div className="flex-[2] py-2">
+          {/* Right: photo — fixed 128px width, does not grow */}
+          <div className="w-32 flex-shrink-0 py-2">
             <div className="rounded-xl overflow-hidden h-full">
               <CandidatePhoto
-                imgUrl={candidate.imgUrl}
+                huboid={candidate.huboid}
+                sdName={candidate.sdName}
+                sgTypecode={candidate.sgTypecode}
                 name={candidate.name}
-                className="w-full h-full"
+                className="w-full h-full object-top"
               />
             </div>
           </div>

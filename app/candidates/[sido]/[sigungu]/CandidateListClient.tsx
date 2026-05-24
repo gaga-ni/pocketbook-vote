@@ -230,7 +230,9 @@ function CandidateCard({
       {/* Right section — flex-[2], photo */}
       <div className="flex-[2] self-stretch min-h-[160px]">
         <CandidatePhoto
-          imgUrl={candidate.imgUrl}
+          huboid={candidate.huboid}
+          sdName={candidate.sdName}
+          sgTypecode={candidate.sgTypecode}
           name={candidate.name}
           className="w-full h-full"
         />

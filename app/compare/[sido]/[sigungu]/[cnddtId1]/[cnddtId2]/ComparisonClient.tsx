@@ -155,11 +155,13 @@ function CandidateHeaderCol({
         </div>
 
         {/* Photo */}
-        <div className="aspect-[3/2] rounded-xl overflow-hidden w-full">
+        <div className="w-full aspect-[3/2] rounded-xl overflow-hidden">
           <CandidatePhoto
-            imgUrl={candidate.imgUrl}
+            huboid={candidate.huboid}
+            sdName={candidate.sdName}
+            sgTypecode={candidate.sgTypecode}
             name={candidate.name}
-            className="w-full h-full"
+            className="w-full h-full object-top"
           />
         </div>
       </Link>
