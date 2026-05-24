@@ -27,13 +27,7 @@ export interface PledgeItem {
   sections: PledgeSection[];
 }
 
-// Construct absolute base URL for internal API calls from server components.
-// NEXT_PUBLIC_BASE_URL must be set in Vercel env vars (e.g. https://your-app.vercel.app).
-function getBaseUrl(): string {
-  if (process.env.NEXT_PUBLIC_BASE_URL) return process.env.NEXT_PUBLIC_BASE_URL.replace(/\/$/, '');
-  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
-  return `http://localhost:${process.env.PORT ?? 3000}`;
-}
+import { getBaseUrl } from './baseUrl';
 
 export async function fetchCandidatesByType(
   sido: string,
