@@ -1,3 +1,9 @@
+import {
+  fetchCandidates as necFetchCandidates,
+  fetchPledges as necFetchPledges,
+  fetchSigungu as necFetchSigungu,
+} from './necApi';
+
 export interface Candidate {
   huboid: string;
   sgTypecode: string;
@@ -27,34 +33,35 @@ export interface PledgeItem {
   sections: PledgeSection[];
 }
 
-import { getBaseUrl } from './baseUrl';
-
 export async function fetchCandidatesByType(
   sido: string,
   sgTypecode: number
 ): Promise<Candidate[]> {
-  try {
-    const url =
-      `${getBaseUrl()}/api/candidates` +
-      `?sido=${encodeURIComponent(sido)}&sgTypecode=${sgTypecode}`;
-    const res = await fetch(url, { cache: 'no-store' });
-    if (!res.ok) return [];
-    return res.json() as Promise<Candidate[]>;
-  } catch {
-    return [];
-  }
+  const raw = await necFetchCandidates(sido, sgTypecode);
+  return raw.map((item) => ({
+    huboid: String(item.huboid ?? ''),
+    sgTypecode: String(item.sgTypecode ?? ''),
+    giho: String(item.giho ?? ''),
+    name: String(item.name ?? ''),
+    jdName: String(item.jdName ?? ''),
+    age: String(item.age ?? ''),
+    gender: String(item.gender ?? ''),
+    birthday: String(item.birthday ?? ''),
+    job: String(item.job ?? ''),
+    edu: String(item.edu ?? ''),
+    career1: String(item.career1 ?? ''),
+    career2: String(item.career2 ?? ''),
+    sggName: String(item.sggName ?? ''),
+    sdName: String(item.sdName ?? ''),
+    imgUrl: String(item.imgUrl ?? ''),
+  }));
 }
 
 export async function fetchSigunguList(sido: string): Promise<string[]> {
-  try {
-    const url = `${getBaseUrl()}/api/sigungu?sido=${encodeURIComponent(sido)}`;
-    const res = await fetch(url, { cache: 'no-store' });
-    if (!res.ok) return [];
-    const data = await res.json() as { sigunguList: string[] };
-    return data.sigunguList ?? [];
-  } catch {
-    return [];
-  }
+  const raw = await necFetchSigungu(sido);
+  const filtered = raw.filter((item) => String(item.sdName ?? '') === sido);
+  const names = [...new Set(filtered.map((item) => String(item.sggName ?? '')).filter(Boolean))];
+  return names.sort((a, b) => a.localeCompare(b, 'ko'));
 }
 
 export async function findCandidateWithType(
@@ -82,16 +89,15 @@ export async function fetchPledges(
   cnddtId: string,
   sgTypecode: string
 ): Promise<PledgeItem[]> {
-  try {
-    const url =
-      `${getBaseUrl()}/api/pledges` +
-      `?cnddtId=${cnddtId}&sgTypecode=${sgTypecode}`;
-    const res = await fetch(url, { cache: 'no-store' });
-    if (!res.ok) return [];
-    return res.json() as Promise<PledgeItem[]>;
-  } catch {
-    return [];
-  }
+  const raw = await necFetchPledges(cnddtId, sgTypecode);
+  if (!raw) return [];
+  const count = Math.min(parseInt(String(raw.prmsCnt ?? '0'), 10), 10);
+  return Array.from({ length: count }, (_, i) => {
+    const n = i + 1;
+    const title = String(raw[`prmsTitle${n}`] ?? '');
+    const content = String(raw[`prmmCont${n}`] ?? '');
+    return { number: n, title, sections: parsePledgeContent(content) };
+  }).filter((p) => p.title);
 }
 
 export function parsePledgeContent(content: string): PledgeSection[] {
