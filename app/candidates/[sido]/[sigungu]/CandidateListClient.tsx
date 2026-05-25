@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import type { Candidate } from '@/app/lib/nec-api';
@@ -15,6 +15,10 @@ const TAB_LABELS: Record<TabType, string> = {
   '4': '구·시·군의 장',
   '11': '교육감',
 };
+
+function toTabType(raw: string | null, fallback: TabType): TabType {
+  return raw === '3' || raw === '4' || raw === '11' ? raw : fallback;
+}
 
 interface Props {
   sido: string;
@@ -35,32 +39,39 @@ export default function CandidateListClient({
 }: Props) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const rawTab = searchParams.get('tab');
-  const activeTab: TabType =
-    rawTab === '3' || rawTab === '4' || rawTab === '11'
-      ? rawTab
-      : (initialCompare?.sgTypecode ?? '3');
+
+  const defaultTab = toTabType(null, initialCompare?.sgTypecode ?? '3');
+  const [visualTab, setVisualTab] = useState<TabType>(
+    toTabType(searchParams.get('tab'), defaultTab)
+  );
+  const [isTabLoading, setIsTabLoading] = useState(false);
   const [selected, setSelected] = useState<string[]>(
     initialCompare ? [initialCompare.cnddtId] : []
   );
   const [isLoading, setIsLoading] = useState(false);
-  const [isTabLoading, setIsTabLoading] = useState(false);
+
+  // Sync visualTab when URL changes externally (browser back/forward)
+  useEffect(() => {
+    setVisualTab(toTabType(searchParams.get('tab'), defaultTab));
+  }, [searchParams, defaultTab]);
 
   const allByTab: Record<TabType, Candidate[]> = {
     '3': type3,
     '4': type4,
     '11': type11,
   };
-  const activeCandidates = allByTab[activeTab];
+  const activeCandidates = allByTab[visualTab];
   const selectedCandidates = activeCandidates.filter((c) => selected.includes(c.huboid));
 
-  function switchTab(tab: TabType) {
+  function handleTabChange(tab: TabType) {
+    if (tab === visualTab) return;
+    setVisualTab(tab);
     setIsTabLoading(true);
+    setSelected([]);
     const params = new URLSearchParams(searchParams.toString());
     params.set('tab', tab);
     router.replace(`?${params.toString()}`, { scroll: false });
-    setSelected([]);
-    setTimeout(() => setIsTabLoading(false), 300);
+    setTimeout(() => setIsTabLoading(false), 400);
   }
 
   function toggleCompare(huboid: string) {
@@ -79,9 +90,9 @@ export default function CandidateListClient({
           {(Object.keys(TAB_LABELS) as TabType[]).map((tab) => (
             <button
               key={tab}
-              onClick={() => switchTab(tab)}
+              onClick={() => handleTabChange(tab)}
               className={`px-4 py-2 rounded-full text-[14px] font-medium leading-[20px] transition-colors whitespace-nowrap ${
-                activeTab === tab
+                visualTab === tab
                   ? 'bg-primary text-on-dark'
                   : 'bg-canvas-soft text-ink'
               }`}
