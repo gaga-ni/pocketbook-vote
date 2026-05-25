@@ -6,7 +6,7 @@ const PARTY_COLORS: Record<string, { main: string; sub: string }> = {
   '국민연합': { main: '#EC008B', sub: '#FFDEF5' },
   '여성의당': { main: '#6400AA', sub: '#F4E0FF' },
   '자유통일당': { main: '#D33C3B', sub: '#FFDEDE' },
-  '정의당': { main: '#CAAD0A', sub: '#FFFBC9' },
+  '정의당': { main: '#FFED00', sub: '#FFFBC9' },
   '조국혁신당': { main: '#004098', sub: '#DBEFFF' },
   '노동당': { main: '#FF0000', sub: '#FFDCDC' },
   '기본소득당': { main: '#00D2C3', sub: '#E8FFFD' },
@@ -16,9 +16,13 @@ const PARTY_COLORS: Record<string, { main: string; sub: string }> = {
   '국민당': { main: '#E61E2B', sub: '#FFE6E8' },
 };
 
-const DEFAULT = { main: '#222222', sub: '#EBEBEB' };
+const LIGHT_PARTIES = new Set(['정의당', '기본소득당', '새미래민주당', '녹색당']);
 
 export function getPartyStyle(partyName: string): { color: string; backgroundColor: string } {
-  const colors = PARTY_COLORS[partyName] ?? DEFAULT;
-  return { color: colors.main, backgroundColor: colors.sub };
+  const party = PARTY_COLORS[partyName];
+  if (!party) return { backgroundColor: '#222222', color: '#ffffff' };
+  return {
+    backgroundColor: party.main,
+    color: LIGHT_PARTIES.has(partyName) ? '#000000' : '#ffffff',
+  };
 }

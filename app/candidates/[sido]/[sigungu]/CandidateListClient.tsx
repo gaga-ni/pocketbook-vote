@@ -2,9 +2,9 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import type { Candidate } from '@/app/lib/nec-api';
-import { formatBirthdayDot } from '@/app/lib/nec-api';
+import { formatBirthdayDot, getElectionLabel } from '@/app/lib/nec-api';
 import { getPartyStyle } from '@/app/lib/partyColors';
 import CandidatePhoto from '@/app/components/CandidatePhoto';
 
@@ -34,12 +34,16 @@ export default function CandidateListClient({
   initialCompare,
 }: Props) {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<TabType>(
-    initialCompare?.sgTypecode ?? '3'
-  );
+  const searchParams = useSearchParams();
+  const rawTab = searchParams.get('tab');
+  const activeTab: TabType =
+    rawTab === '3' || rawTab === '4' || rawTab === '11'
+      ? rawTab
+      : (initialCompare?.sgTypecode ?? '3');
   const [selected, setSelected] = useState<string[]>(
     initialCompare ? [initialCompare.cnddtId] : []
   );
+  const [isLoading, setIsLoading] = useState(false);
 
   const allByTab: Record<TabType, Candidate[]> = {
     '3': type3,
@@ -50,7 +54,9 @@ export default function CandidateListClient({
   const selectedCandidates = activeCandidates.filter((c) => selected.includes(c.huboid));
 
   function switchTab(tab: TabType) {
-    setActiveTab(tab);
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('tab', tab);
+    router.replace(`?${params.toString()}`, { scroll: false });
     setSelected([]);
   }
 
@@ -97,7 +103,6 @@ export default function CandidateListClient({
                 candidate={candidate}
                 sido={sido}
                 sigungu={sigungu}
-                showDistrict={activeTab === '4'}
                 isSelected={selected.includes(candidate.huboid)}
                 onToggleCompare={() => toggleCompare(candidate.huboid)}
                 compareDisabled={
@@ -125,14 +130,21 @@ export default function CandidateListClient({
           </div>
           {selected.length === 2 && (
             <button
-              onClick={() =>
+              onClick={() => {
+                setIsLoading(true);
                 router.push(
                   `/compare/${encodeURIComponent(sido)}/${encodeURIComponent(sigungu)}/${selected[0]}/${selected[1]}`
-                )
-              }
+                );
+              }}
+              disabled={isLoading}
               className="flex-shrink-0 bg-primary text-on-dark text-[16px] font-medium leading-[20px] px-5 py-3 rounded-full"
             >
-              공약 비교하기
+              {isLoading ? (
+                <span className="flex items-center gap-2">
+                  <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  공약 비교 중...
+                </span>
+              ) : '공약 비교하기'}
             </button>
           )}
         </div>
@@ -147,7 +159,6 @@ interface CardProps {
   candidate: Candidate;
   sido: string;
   sigungu: string;
-  showDistrict: boolean;
   isSelected: boolean;
   onToggleCompare: () => void;
   compareDisabled: boolean;
@@ -157,7 +168,6 @@ function CandidateCard({
   candidate,
   sido,
   sigungu,
-  showDistrict,
   isSelected,
   onToggleCompare,
   compareDisabled,
@@ -165,6 +175,7 @@ function CandidateCard({
   const detailUrl = `/candidates/${encodeURIComponent(sido)}/${encodeURIComponent(sigungu)}/${candidate.huboid}`;
   const showPartyBadge = candidate.jdName && candidate.jdName !== '무소속';
   const partyStyle = getPartyStyle(candidate.jdName);
+  const electionLabel = getElectionLabel(candidate.sgTypecode, candidate.sdName, candidate.sggName);
 
   return (
     <div
@@ -185,9 +196,11 @@ function CandidateCard({
       <div className="flex-[3] p-5 flex flex-col gap-2 min-w-0">
         {/* Row 1: 기호 N + name + party badge */}
         <div className="flex items-baseline gap-1.5 flex-wrap">
-          <span className="text-[14px] font-normal leading-[20px] text-body whitespace-nowrap">
-            기호 {candidate.giho}
-          </span>
+          {candidate.sgTypecode !== '11' && (
+            <span className="text-[14px] font-normal leading-[20px] text-body whitespace-nowrap">
+              기호 {candidate.giho}
+            </span>
+          )}
           <p className="text-[20px] font-bold leading-[28px] text-ink">{candidate.name}</p>
           {showPartyBadge && (
             <span
@@ -204,10 +217,8 @@ function CandidateCard({
           {formatBirthdayDot(candidate.birthday)} · {candidate.age}세 · {candidate.gender}
         </p>
 
-        {/* Row 3: district (구시군의장 only) */}
-        {showDistrict && candidate.sggName && (
-          <p className="text-[14px] font-normal leading-[20px] text-body">{candidate.sggName}</p>
-        )}
+        {/* Row 3: election type label */}
+        <p className="text-[14px] font-normal leading-[20px] text-body">{electionLabel}</p>
 
         <div className="flex-1" />
 
@@ -215,7 +226,7 @@ function CandidateCard({
         <button
           onClick={(e) => { e.stopPropagation(); onToggleCompare(); }}
           disabled={compareDisabled}
-          className={`relative z-[2] mt-1 w-full py-2 rounded-full text-[14px] font-medium leading-[20px] transition-colors ${
+          className={`relative z-[2] mt-2 self-start px-4 py-3 rounded-full text-[14px] font-medium leading-[20px] transition-colors ${
             isSelected
               ? 'bg-primary text-on-dark'
               : compareDisabled
@@ -227,14 +238,14 @@ function CandidateCard({
         </button>
       </div>
 
-      {/* Right section — flex-[2], photo */}
-      <div className="flex-[2] self-stretch min-h-[160px]">
+      {/* Right section — photo stretches to full card height */}
+      <div className="w-36 flex-shrink-0 self-stretch overflow-hidden rounded-r-2xl">
         <CandidatePhoto
           huboid={candidate.huboid}
           sdName={candidate.sdName}
           sgTypecode={candidate.sgTypecode}
           name={candidate.name}
-          className="w-full h-full"
+          className="w-full h-full object-cover object-top"
         />
       </div>
     </div>

@@ -2,10 +2,13 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import type { PledgeItem, PledgeSection, Candidate } from '@/app/lib/nec-api';
+import type { PledgeItem, Candidate } from '@/app/lib/nec-api';
 import { getElectionLabel, formatBirthdayDot } from '@/app/lib/nec-api';
 import { getPartyStyle } from '@/app/lib/partyColors';
+import { getPledgeCategory } from '@/app/lib/categoryMap';
 import CandidatePhoto from '@/app/components/CandidatePhoto';
+import CategoryChip from '@/app/components/CategoryChip';
+import PledgePopup from '@/app/components/PledgePopup';
 
 interface Props {
   pledges1: PledgeItem[];
@@ -20,6 +23,8 @@ interface Props {
   cnddtId2: string;
 }
 
+const cardShadow = '0 2px 8px rgba(0,0,0,0.10), 0 1px 3px rgba(0,0,0,0.06)';
+
 export default function ComparisonClient({
   pledges1,
   pledges2,
@@ -33,6 +38,24 @@ export default function ComparisonClient({
   cnddtId2,
 }: Props) {
   const [removed, setRemoved] = useState<null | '1' | '2'>(null);
+  const [popup1Index, setPopup1Index] = useState<number | null>(null);
+  const [popup2Index, setPopup2Index] = useState<number | null>(null);
+
+  function removeCand(which: '1' | '2') {
+    setRemoved(which);
+    if (which === '1') setPopup1Index(null);
+    if (which === '2') setPopup2Index(null);
+  }
+
+  function openPopup1(index: number) {
+    setPopup2Index(null);
+    setPopup1Index(index);
+  }
+
+  function openPopup2(index: number) {
+    setPopup1Index(null);
+    setPopup2Index(index);
+  }
 
   const listUrl = `/candidates/${encodedSido}/${encodedSigungu}`;
   const activePledges1 = removed === '1' ? [] : pledges1;
@@ -54,7 +77,8 @@ export default function ComparisonClient({
               sgTypecode={sgTypecode1}
               encodedSido={encodedSido}
               encodedSigungu={encodedSigungu}
-              onRemove={() => setRemoved('1')}
+              onRemove={() => removeCand('1')}
+              pledges={activePledges1}
             />
           )}
           {removed === '2' ? (
@@ -65,7 +89,8 @@ export default function ComparisonClient({
               sgTypecode={sgTypecode2}
               encodedSido={encodedSido}
               encodedSigungu={encodedSigungu}
-              onRemove={() => setRemoved('2')}
+              onRemove={() => removeCand('2')}
+              pledges={activePledges2}
             />
           )}
         </div>
@@ -76,22 +101,107 @@ export default function ComparisonClient({
         <h2 className="text-[20px] font-bold leading-[28px] text-ink">5대 공약 비교</h2>
       </div>
 
-      {/* ── Pledge comparison rows — two independent columns ── */}
+      {/* ── Pledge comparison rows — equal-height paired cards ── */}
       <section className="flex-1 pb-12 max-w-[1200px] mx-auto w-full px-3 md:px-5">
-        <div className="grid grid-cols-2 items-start gap-2">
-          <div className="flex flex-col gap-2">
-            {left.map((pledge, i) => (
-              <PledgeAccordion key={i} pledge={pledge} n={i + 1} />
-            ))}
-          </div>
-          <div className="flex flex-col gap-2">
-            {right.map((pledge, i) => (
-              <PledgeAccordion key={i} pledge={pledge} n={i + 1} />
-            ))}
-          </div>
+        <div className="flex flex-col gap-2">
+          {Array.from({ length: count }, (_, i) => (
+            <div key={i} className="grid grid-cols-2 items-stretch gap-2">
+              <PledgeCard
+                pledge={left[i]}
+                n={i + 1}
+                onOpen={left[i] !== null ? () => openPopup1(i) : undefined}
+              />
+              <PledgeCard
+                pledge={right[i]}
+                n={i + 1}
+                onOpen={right[i] !== null ? () => openPopup2(i) : undefined}
+              />
+            </div>
+          ))}
         </div>
       </section>
+
+      {/* ── Popups ── */}
+      <PledgePopup
+        isOpen={popup1Index !== null}
+        onClose={() => setPopup1Index(null)}
+        pledges={activePledges1}
+        currentIndex={popup1Index ?? 0}
+        onIndexChange={setPopup1Index}
+        candidateInfo={{
+          name: cand1.name,
+          giho: cand1.giho,
+          sgTypecode: sgTypecode1,
+          sdName: cand1.sdName,
+          sggName: cand1.sggName,
+        }}
+      />
+      <PledgePopup
+        isOpen={popup2Index !== null}
+        onClose={() => setPopup2Index(null)}
+        pledges={activePledges2}
+        currentIndex={popup2Index ?? 0}
+        onIndexChange={setPopup2Index}
+        candidateInfo={{
+          name: cand2.name,
+          giho: cand2.giho,
+          sgTypecode: sgTypecode2,
+          sdName: cand2.sdName,
+          sggName: cand2.sggName,
+        }}
+      />
     </>
+  );
+}
+
+// ── Pledge Card ──────────────────────────────────────────────────
+
+interface PledgeCardProps {
+  pledge: PledgeItem | null;
+  n: number;
+  onOpen?: () => void;
+}
+
+function PledgeCard({ pledge, n, onOpen }: PledgeCardProps) {
+  if (!pledge) {
+    return (
+      <div
+        className="h-full"
+        style={{ background: '#f3f3f3', borderRadius: '16px', minHeight: '120px' }}
+      />
+    );
+  }
+
+  const category = getPledgeCategory(pledge);
+
+  return (
+    <div
+      className="flex flex-col h-full"
+      style={{ boxShadow: cardShadow, background: '#ffffff', borderRadius: '16px', padding: '20px' }}
+    >
+      {/* Row 1: meta */}
+      <div className="flex items-center gap-2">
+        <span className="text-[14px] font-medium leading-[20px] text-body">공약 {n}</span>
+        <CategoryChip category={category} />
+      </div>
+
+      {/* Row 2: title — flex-1 so button is always at bottom */}
+      <p
+        className="flex-1 text-[20px] font-bold text-ink"
+        style={{ marginTop: '8px', lineHeight: '28px' }}
+      >
+        {pledge.title}
+      </p>
+
+      {/* Row 3: more button — always at bottom */}
+      <div className="flex justify-end mt-auto" style={{ paddingTop: '14px' }}>
+        {onOpen && (
+          <button onClick={onOpen} aria-label="더보기">
+            <img src="/button_more.svg" alt="더보기" />
+          </button>
+        )}
+      </div>
+    </div>
   );
 }
 
@@ -103,6 +213,7 @@ interface HeaderColProps {
   encodedSido: string;
   encodedSigungu: string;
   onRemove: () => void;
+  pledges: PledgeItem[];
 }
 
 function CandidateHeaderCol({
@@ -111,9 +222,11 @@ function CandidateHeaderCol({
   encodedSido,
   encodedSigungu,
   onRemove,
+  pledges,
 }: HeaderColProps) {
   const partyStyle = getPartyStyle(candidate.jdName);
   const showPartyBadge = candidate.jdName && candidate.jdName !== '무소속';
+  const showGiho = sgTypecode !== '11';
   const electionLabel = getElectionLabel(sgTypecode, candidate.sdName, candidate.sggName);
   const detailUrl = `/candidates/${encodedSido}/${encodedSigungu}/${candidate.huboid}`;
 
@@ -138,11 +251,13 @@ function CandidateHeaderCol({
 
       {/* Link wraps name row + photo */}
       <Link href={detailUrl} className="flex flex-col gap-2 hover:opacity-90 transition-opacity">
-        {/* 기호 N + name + party badge */}
+        {/* name row */}
         <div className="flex items-baseline gap-1.5 flex-wrap pr-8">
-          <span className="text-[14px] font-medium leading-[20px] text-body whitespace-nowrap">
-            기호 {candidate.giho}
-          </span>
+          {showGiho && (
+            <span className="text-[14px] font-medium leading-[20px] text-body whitespace-nowrap">
+              기호 {candidate.giho}
+            </span>
+          )}
           <p className="text-[16px] font-medium leading-[20px] text-ink">{candidate.name}</p>
           {showPartyBadge && (
             <span
@@ -155,13 +270,13 @@ function CandidateHeaderCol({
         </div>
 
         {/* Photo */}
-        <div className="w-full aspect-[3/2] rounded-xl overflow-hidden">
+        <div className="w-full aspect-[4/3] rounded-xl overflow-hidden">
           <CandidatePhoto
             huboid={candidate.huboid}
             sdName={candidate.sdName}
             sgTypecode={candidate.sgTypecode}
             name={candidate.name}
-            className="w-full h-full object-top"
+            className="w-full h-full object-cover object-top"
           />
         </div>
       </Link>
@@ -173,6 +288,25 @@ function CandidateHeaderCol({
       <p className="text-[14px] font-normal leading-[20px] text-body">
         {formatBirthdayDot(candidate.birthday)} · {candidate.age}세 · {candidate.gender}
       </p>
+
+      {/* 주요 공약 */}
+      {pledges.length > 0 && (() => {
+        const counts = pledges.reduce<Record<string, number>>((acc, p) => {
+          const cat = getPledgeCategory(p);
+          acc[cat] = (acc[cat] ?? 0) + 1;
+          return acc;
+        }, {});
+        return (
+          <div style={{ marginTop: '8px' }}>
+            <p className="text-[12px] font-medium" style={{ color: '#555555' }}>주요 공약</p>
+            <div className="flex flex-wrap gap-1 mt-1">
+              {Object.entries(counts).map(([cat, cnt]) => (
+                <CategoryChip key={cat} category={cat} count={cnt} />
+              ))}
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 }
@@ -191,101 +325,5 @@ function PlaceholderHeader({ href }: { href: string }) {
         <p className="text-[14px] font-normal" style={{ color: '#5e5e5e' }}>비교할 후보자 선택</p>
       </Link>
     </div>
-  );
-}
-
-// ── Single independent accordion ────────────────────────────────
-
-interface AccordionProps {
-  pledge: PledgeItem | null;
-  n: number;
-}
-
-const cardShadow = '0 2px 8px rgba(0,0,0,0.10), 0 1px 3px rgba(0,0,0,0.06)';
-
-function PledgeAccordion({ pledge, n }: AccordionProps) {
-  const [isOpen, setIsOpen] = useState(false);
-
-  if (!pledge) {
-    return (
-      <div
-        style={{
-          background: '#f3f3f3',
-          borderRadius: '12px',
-          minHeight: '64px',
-        }}
-      />
-    );
-  }
-
-  return (
-    <div style={{ boxShadow: cardShadow, background: '#ffffff', borderRadius: '12px' }}>
-      <button
-        onClick={() => setIsOpen((v) => !v)}
-        className="w-full flex items-start justify-between gap-2 text-left"
-        style={{ padding: '12px 16px' }}
-      >
-        <div className="flex-1 flex flex-col gap-0.5">
-          <span className="text-[14px] font-medium leading-[20px] text-body">
-            공약 {n}.
-          </span>
-          <span className="text-[17px] font-medium leading-[26px] text-ink">
-            {pledge.title}
-          </span>
-        </div>
-        <Chevron open={isOpen} />
-      </button>
-
-      <div
-        className="grid transition-all duration-300 ease-in-out"
-        style={{ gridTemplateRows: isOpen ? '1fr' : '0fr' }}
-      >
-        <div className="overflow-hidden">
-          <div className="mx-4 border-t border-gray-200 mt-3 mb-3" />
-          <div className="space-y-4" style={{ padding: '0 16px 12px' }}>
-            {pledge.sections.map((section, i) => (
-              <SectionBlock key={i} section={section} />
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function SectionBlock({ section }: { section: PledgeSection }) {
-  return (
-    <div>
-      <p
-        className="mb-1"
-        style={{ fontSize: '13px', fontWeight: 600, color: '#282828', lineHeight: '20px' }}
-      >
-        {section.label}
-      </p>
-      <p className="text-[14px] font-normal leading-[22px] text-body whitespace-pre-wrap">
-        {section.body}
-      </p>
-    </div>
-  );
-}
-
-function Chevron({ open }: { open: boolean }) {
-  return (
-    <svg
-      width="14"
-      height="14"
-      viewBox="0 0 16 16"
-      fill="none"
-      aria-hidden="true"
-      className={`flex-shrink-0 text-body transition-transform duration-200 mt-1 ${open ? 'rotate-180' : ''}`}
-    >
-      <path
-        d="M4 6l4 4 4-4"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
   );
 }

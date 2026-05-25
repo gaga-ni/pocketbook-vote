@@ -9,6 +9,7 @@ interface Props {
   sgTypecode: string;
   name: string;
   className?: string;
+  hideOnError?: boolean;
 }
 
 export default function CandidatePhoto({
@@ -17,15 +18,20 @@ export default function CandidatePhoto({
   sgTypecode,
   name,
   className = '',
+  hideOnError = false,
 }: Props) {
   const [error, setError] = useState(false);
 
   if (error || !huboid) {
+    if (hideOnError) return null;
     return (
-      <div className={`bg-canvas-soft flex items-center justify-center ${className}`}>
-        <span className="text-[20px] font-bold leading-[28px] text-body select-none">
-          {name.charAt(0)}
-        </span>
+      <div className={`flex items-center justify-center ${className}`} style={{ background: '#efefef' }}>
+        <img
+          src="/img_default.svg"
+          alt="기본 이미지"
+          className="w-1/2 h-1/2 object-contain opacity-40"
+          style={{ filter: 'brightness(0) invert(1)' }}
+        />
       </div>
     );
   }

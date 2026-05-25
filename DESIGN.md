@@ -66,19 +66,19 @@ The two active weights never cross roles — 700 is headline-only; 400 is body-o
 
 | Token | Size | Weight | Line Height | Usage |
 |---|---|---|---|---|
-| `{typography.display-xxl}` | 52px | 700 | 64px | Hero headline |
-| `{typography.display-xl}` | 36px | 700 | 44px | Page section headlines |
-| `{typography.display-lg}` | 32px | 700 | 40px | Promo card headlines |
-| `{typography.display-md}` | 24px | 700 | 32px | Card titles, candidate names |
+| `{typography.display-xxl}` | 52px | 700 | 73px | Hero headline |
+| `{typography.display-xl}` | 36px | 700 | 50px | Page section headlines |
+| `{typography.display-lg}` | 32px | 700 | 45px | Promo card headlines |
+| `{typography.display-md}` | 24px | 700 | 34px | Card titles, candidate names |
 | `{typography.display-sm}` | 20px | 700 | 28px | Sub-card headings |
-| `{typography.body-lg}` | 18px | 500 | 24px | Lead paragraphs, larger body |
-| `{typography.body-md}` | 16px | 400 | 24px | Default paragraph body |
-| `{typography.body-md-strong}` | 16px | 500 | 20px | Bolded inline body, most button labels |
+| `{typography.body-lg}` | 18px | 500 | 25px | Lead paragraphs, larger body |
+| `{typography.body-md}` | 16px | 400 | 22px | Default paragraph body |
+| `{typography.body-md-strong}` | 16px | 500 | 22px | Bolded inline body, most button labels |
 | `{typography.body-sm}` | 14px | 400 | 20px | Captions, secondary metadata |
-| `{typography.body-sm-strong}` | 14px | 500 | 16px | Bold caption / chip labels |
-| `{typography.caption}` | 12px | 400 | 20px | Fine print, footer secondary lines |
-| `{typography.button-large}` | 18px | 500 | 24px | Large buttons inside forms |
-| `{typography.button-md}` | 16px | 500 | 20px | Default button label |
+| `{typography.body-sm-strong}` | 14px | 500 | 20px | Bold caption / chip labels |
+| `{typography.caption}` | 12px | 400 | 17px | Fine print, footer secondary lines |
+| `{typography.button-large}` | 18px | 500 | 25px | Large buttons inside forms |
+| `{typography.button-md}` | 16px | 500 | 22px | Default button label |
 
 ### Principles
 - **Sentence-case is the voice.** No all-caps headlines.

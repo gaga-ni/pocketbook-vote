@@ -7,7 +7,10 @@ import {
   formatBirthdayDot,
 } from '@/app/lib/nec-api';
 import { getPartyStyle } from '@/app/lib/partyColors';
-import CandidatePhoto from '@/app/components/CandidatePhoto';
+import { getPledgeCategory } from '@/app/lib/categoryMap';
+import CategoryChip from '@/app/components/CategoryChip';
+import ProfilePhotoSection from '@/app/components/ProfilePhotoSection';
+import BackButton from '@/app/components/BackButton';
 import PledgeSection from './PledgeSection';
 
 export default async function CandidateDetailPage({
@@ -17,7 +20,6 @@ export default async function CandidateDetailPage({
 }) {
   const { sido: encodedSido, sigungu: encodedSigungu, cnddtId } = await params;
   const sido = decodeURIComponent(encodedSido);
-  const sigungu = decodeURIComponent(encodedSigungu);
 
   const { candidate, sgTypecode } = await findCandidateWithType(sido, cnddtId);
   if (!candidate) notFound();
@@ -33,13 +35,7 @@ export default async function CandidateDetailPage({
 
       {/* ── Nav bar ── */}
       <nav className="sticky top-0 z-20 bg-canvas border-b border-canvas-soft px-4 md:px-8 py-4 flex items-center gap-3">
-        <Link
-          href={listUrl}
-          className="w-10 h-10 flex items-center justify-center rounded-full bg-canvas-soft text-ink text-[18px] flex-shrink-0"
-          aria-label="목록으로"
-        >
-          ←
-        </Link>
+        <BackButton />
         <h1 className="text-[20px] font-bold leading-[28px] text-ink truncate">
           {candidate.name}
         </h1>
@@ -51,9 +47,11 @@ export default async function CandidateDetailPage({
         <div className="flex flex-row">
           {/* Left: 기호 / name / election label / party badge */}
           <div className="flex-1 py-2 pr-4 flex flex-col gap-2 min-w-0">
-            <span className="text-[14px] font-medium leading-[20px] text-body">
-              기호 {candidate.giho}
-            </span>
+            {sgTypecode !== '11' && (
+              <span className="text-[14px] font-medium leading-[20px] text-body">
+                기호 {candidate.giho}
+              </span>
+            )}
             <p className="text-[24px] font-bold leading-[32px] text-ink">{candidate.name}</p>
             <p className="text-[14px] font-normal leading-[20px] text-body">{electionLabel}</p>
             {showPartyBadge && (
@@ -66,18 +64,13 @@ export default async function CandidateDetailPage({
             )}
           </div>
 
-          {/* Right: photo — fixed 128px width, does not grow */}
-          <div className="w-32 flex-shrink-0 py-2">
-            <div className="rounded-xl overflow-hidden h-full">
-              <CandidatePhoto
-                huboid={candidate.huboid}
-                sdName={candidate.sdName}
-                sgTypecode={candidate.sgTypecode}
-                name={candidate.name}
-                className="w-full h-full object-top"
-              />
-            </div>
-          </div>
+          {/* Right: photo — collapses entirely if photo fails to load */}
+          <ProfilePhotoSection
+            huboid={candidate.huboid}
+            sdName={candidate.sdName}
+            sgTypecode={candidate.sgTypecode}
+            name={candidate.name}
+          />
         </div>
 
         {/* Divider */}
@@ -113,6 +106,25 @@ export default async function CandidateDetailPage({
             </p>
           )}
         </div>
+
+        {/* 주요 공약 category chips */}
+        {pledges.length > 0 && (() => {
+          const counts = pledges.reduce<Record<string, number>>((acc, p) => {
+            const cat = getPledgeCategory(p);
+            acc[cat] = (acc[cat] ?? 0) + 1;
+            return acc;
+          }, {});
+          return (
+            <div style={{ marginTop: '12px', marginBottom: '4px' }}>
+              <p className="text-[12px] font-medium" style={{ color: '#555555' }}>주요 공약</p>
+              <div className="flex flex-wrap gap-1 mt-2">
+                {Object.entries(counts).map(([cat, cnt]) => (
+                  <CategoryChip key={cat} category={cat} count={cnt} />
+                ))}
+              </div>
+            </div>
+          );
+        })()}
       </section>
 
       {/* ── Section heading ── */}
@@ -120,9 +132,16 @@ export default async function CandidateDetailPage({
         <h2 className="text-[20px] font-bold leading-[28px] text-ink">5대 공약</h2>
       </div>
 
-      {/* ── Pledge accordion ── */}
+      {/* ── Pledge cards ── */}
       <section className="flex-1 px-4 md:px-8 pt-2 pb-28 max-w-[1200px] mx-auto w-full">
-        <PledgeSection pledges={pledges} />
+        <PledgeSection
+          pledges={pledges}
+          name={candidate.name}
+          giho={candidate.giho}
+          sgTypecode={sgTypecode}
+          sdName={candidate.sdName}
+          sggName={candidate.sggName}
+        />
       </section>
 
       {/* ── Bottom CTA ── */}
