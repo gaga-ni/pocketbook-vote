@@ -7,8 +7,9 @@ interface RainIcon {
   src: string;
   x: number;
   delay: number;
-  size: number;
+  duration: number;
   rotation: number;
+  spin: number;
 }
 
 const ICONS = Array.from({ length: 11 }, (_, i) =>
@@ -26,10 +27,11 @@ export default function LogoRain() {
     const icons: RainIcon[] = ICONS.map((src, i) => ({
       id: Date.now() + i,
       src,
-      x: 10 + Math.random() * 80,
-      delay: Math.random() * 400,
-      size: 36 + Math.floor(Math.random() * 24),
-      rotation: -20 + Math.random() * 40,
+      x: 5 + Math.random() * 85,
+      delay: Math.random() * 600,
+      duration: 1.0 + Math.random() * 1.2,
+      rotation: -30 + Math.random() * 60,
+      spin: Math.random() > 0.5 ? 1 : -1,
     }));
 
     setRainIcons(icons);
@@ -37,7 +39,7 @@ export default function LogoRain() {
     setTimeout(() => {
       setRainIcons([]);
       setIsAnimating(false);
-    }, 1800);
+    }, 3000);
   }, [isAnimating]);
 
   return (
@@ -57,13 +59,13 @@ export default function LogoRain() {
               alt=""
               style={{
                 position: 'absolute',
-                top: '-60px',
+                top: '-80px',
                 left: `${icon.x}%`,
-                width: `${icon.size}px`,
-                height: `${icon.size}px`,
-                '--rot': `${icon.rotation}deg`,
-                animation: 'rainFall 1.4s ease-in forwards',
+                transform: `rotate(${icon.rotation}deg)`,
+                animation: `rainFall ${icon.duration}s ease-in forwards`,
                 animationDelay: `${icon.delay}ms`,
+                '--rot': `${icon.rotation}deg`,
+                '--spin': `${icon.spin}`,
               } as React.CSSProperties}
             />
           ))}
@@ -76,11 +78,11 @@ export default function LogoRain() {
             transform: translateY(0) rotate(var(--rot, 0deg));
             opacity: 1;
           }
-          70% {
+          75% {
             opacity: 1;
           }
           100% {
-            transform: translateY(110vh) rotate(calc(var(--rot, 0deg) + 180deg));
+            transform: translateY(115vh) rotate(calc(var(--rot, 0deg) + calc(var(--spin, 1) * 200deg)));
             opacity: 0;
           }
         }

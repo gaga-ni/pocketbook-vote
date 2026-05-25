@@ -5,10 +5,10 @@ import "./globals.css";
 export const metadata: Metadata = {
   metadataBase: new URL('https://pocketbook-vote.vercel.app'),
   title: '6.3 선거 포켓북',
-  description: '우리 동네 후보자 공약, 한 눈에 비교하세요. 제9회 전국동시지방선거',
+  description: '우리 동네 후보자 공약, 한 눈에 비교하세요. 2026 제9회 전국동시지방선거',
   openGraph: {
     title: '6.3 선거 포켓북',
-    description: '우리 동네 후보자 공약, 한 눈에 비교하세요. 제9회 전국동시지방선거',
+    description: '우리 동네 후보자 공약, 한 눈에 비교하세요. 2026 제9회 전국동시지방선거',
     url: 'https://pocketbook-vote.vercel.app',
     siteName: '6.3 선거 포켓북',
     images: [
