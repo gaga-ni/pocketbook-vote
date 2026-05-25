@@ -47,7 +47,7 @@ export default async function CandidatePage({
         </div>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <Link href="/" aria-label="홈으로" className="flex-shrink-0 ml-3">
-          <img src="/icon_home.svg" alt="홈으로" width="24" height="24" />
+          <img src="/icon_home.svg" alt="홈으로" width="28" height="28" />
         </Link>
       </nav>
 
