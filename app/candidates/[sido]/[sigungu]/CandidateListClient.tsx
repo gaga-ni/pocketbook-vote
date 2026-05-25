@@ -44,6 +44,7 @@ export default function CandidateListClient({
     initialCompare ? [initialCompare.cnddtId] : []
   );
   const [isLoading, setIsLoading] = useState(false);
+  const [isTabLoading, setIsTabLoading] = useState(false);
 
   const allByTab: Record<TabType, Candidate[]> = {
     '3': type3,
@@ -54,10 +55,12 @@ export default function CandidateListClient({
   const selectedCandidates = activeCandidates.filter((c) => selected.includes(c.huboid));
 
   function switchTab(tab: TabType) {
+    setIsTabLoading(true);
     const params = new URLSearchParams(searchParams.toString());
     params.set('tab', tab);
     router.replace(`?${params.toString()}`, { scroll: false });
     setSelected([]);
+    setTimeout(() => setIsTabLoading(false), 300);
   }
 
   function toggleCompare(huboid: string) {
@@ -91,7 +94,26 @@ export default function CandidateListClient({
 
       {/* ── Candidate grid ── */}
       <main className="flex-1 px-4 md:px-8 py-4 pb-36 w-full max-w-[1200px] mx-auto">
-        {activeCandidates.length === 0 ? (
+        {isTabLoading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div
+                key={i}
+                className="bg-white rounded-2xl overflow-hidden flex"
+                style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.08)' }}
+              >
+                <div className="flex-[3] p-5 flex flex-col gap-3">
+                  <div className="skeleton-shimmer h-4 w-24 rounded-full" />
+                  <div className="skeleton-shimmer h-6 w-32 rounded-lg" />
+                  <div className="skeleton-shimmer h-4 w-40 rounded-lg" />
+                  <div className="skeleton-shimmer h-4 w-28 rounded-lg" />
+                  <div className="skeleton-shimmer h-9 w-24 rounded-full mt-2" />
+                </div>
+                <div className="w-36 flex-shrink-0 skeleton-shimmer" />
+              </div>
+            ))}
+          </div>
+        ) : activeCandidates.length === 0 ? (
           <p className="py-16 text-center text-[16px] font-normal leading-[24px] text-body">
             등록된 후보자가 없어요.
           </p>
@@ -245,7 +267,7 @@ function CandidateCard({
           sdName={candidate.sdName}
           sgTypecode={candidate.sgTypecode}
           name={candidate.name}
-          className="w-full h-full object-cover object-top"
+          className="w-full h-full"
         />
       </div>
     </div>

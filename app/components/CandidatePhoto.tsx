@@ -20,16 +20,18 @@ export default function CandidatePhoto({
   className = '',
   hideOnError = false,
 }: Props) {
-  const [error, setError] = useState(false);
+  const [isLoading, setIsLoading] = useState(!!huboid);
+  const [hasError, setHasError] = useState(false);
 
-  if (error || !huboid) {
+  if (!huboid || hasError) {
     if (hideOnError) return null;
     return (
-      <div className={`flex items-center justify-center ${className}`} style={{ background: '#efefef' }}>
+      <div className={`flex items-center justify-center bg-[#efefef] ${className}`}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/img_default.svg"
           alt="기본 이미지"
-          className="w-1/2 h-1/2 object-contain opacity-40"
+          className="w-1/2 h-1/2 object-contain"
           style={{ filter: 'brightness(0) invert(1)' }}
         />
       </div>
@@ -39,12 +41,18 @@ export default function CandidatePhoto({
   const photoUrl = getCandidatePhotoUrl(huboid, sdName, sgTypecode);
 
   return (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img
-      src={photoUrl}
-      alt={name}
-      onError={() => setError(true)}
-      className={`object-cover object-top ${className}`}
-    />
+    <div className={`relative ${className}`}>
+      {isLoading && <div className="absolute inset-0 skeleton-shimmer" />}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={photoUrl}
+        alt={name}
+        className={`w-full h-full object-cover object-top transition-opacity duration-300 ${
+          isLoading ? 'opacity-0' : 'opacity-100'
+        }`}
+        onLoad={() => setIsLoading(false)}
+        onError={() => { setIsLoading(false); setHasError(true); }}
+      />
+    </div>
   );
 }

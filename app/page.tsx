@@ -28,7 +28,7 @@ export default function HomePage() {
           </p>
 
           {/* D-day pill */}
-          <div style={{ marginTop: '16px' }}>
+          <div style={{ marginTop: '20px' }}>
             <span
               className="inline-flex items-center rounded-full text-on-dark text-[14px] font-medium leading-[16px]"
               style={{ background: '#000000', padding: '6px 12px' }}
@@ -42,7 +42,8 @@ export default function HomePage() {
             className="text-[22px] font-bold leading-[32px] text-ink"
             style={{ marginTop: '8px', marginBottom: '12px' }}
           >
-            우리 동네 후보자 공약, 한 눈에 비교하세요.
+            우리 동네 후보자 공약,
+            한 눈에 비교하세요.
           </h1>
 
           {/* Region select card */}
