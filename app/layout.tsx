@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -46,7 +47,10 @@ export default function RootLayout({
         {children}
         <footer style={{ background: '#111111' }} className="px-6 py-8 md:px-8 md:py-10">
           {/* Logo */}
-          <img src="/logo_white.svg" alt="6.3 선거 포켓북" height="36" className="w-auto" style={{ marginBottom: '16px' }} />
+          <Link href="/" style={{ display: 'inline-block', marginBottom: '16px' }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo_white.svg" alt="6.3 선거 포켓북" height="36" className="w-auto" />
+          </Link>
 
           {/* Description */}
           <p className="text-[14px] font-normal" style={{ lineHeight: '1.6', marginBottom: '24px' }}>

@@ -130,7 +130,7 @@ export default function CandidateListClient({
           </p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-            {activeCandidates.map((candidate) => (
+            {activeCandidates.map((candidate, index) => (
               <CandidateCard
                 key={candidate.huboid}
                 candidate={candidate}
@@ -141,6 +141,7 @@ export default function CandidateListClient({
                 compareDisabled={
                   selected.length >= 2 && !selected.includes(candidate.huboid)
                 }
+                priority={index < 3}
               />
             ))}
           </div>
@@ -195,6 +196,7 @@ interface CardProps {
   isSelected: boolean;
   onToggleCompare: () => void;
   compareDisabled: boolean;
+  priority?: boolean;
 }
 
 function CandidateCard({
@@ -204,6 +206,7 @@ function CandidateCard({
   isSelected,
   onToggleCompare,
   compareDisabled,
+  priority = false,
 }: CardProps) {
   const detailUrl = `/candidates/${encodeURIComponent(sido)}/${encodeURIComponent(sigungu)}/${candidate.huboid}`;
   const showPartyBadge = candidate.jdName && candidate.jdName !== '무소속';
@@ -279,6 +282,7 @@ function CandidateCard({
           sgTypecode={candidate.sgTypecode}
           name={candidate.name}
           className="w-full h-full"
+          priority={priority}
         />
       </div>
     </div>

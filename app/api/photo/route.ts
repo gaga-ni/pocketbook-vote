@@ -2,13 +2,13 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const IMAGE_HEADERS = {
   'Content-Type': 'image/jpeg',
-  'Cache-Control': 'public, max-age=86400',
+  'Cache-Control': 'public, max-age=604800, stale-while-revalidate=86400',
 };
 
 async function tryFetchPhoto(url: string): Promise<ArrayBuffer | null> {
   try {
     const res = await fetch(url, {
-      next: { revalidate: 86400 },
+      next: { revalidate: 604800 },
       headers: { 'User-Agent': 'Mozilla/5.0' },
     });
     if (res.ok) return res.arrayBuffer();

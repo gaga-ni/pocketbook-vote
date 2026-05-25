@@ -34,15 +34,21 @@ export default async function CandidatePage({
 
   return (
     <div className="flex flex-col min-h-screen bg-canvas">
-      <nav className="sticky top-0 z-20 bg-canvas border-b border-canvas-soft px-4 md:px-8 py-4 flex items-center gap-3">
-        <Link
-          href="/"
-          className="w-10 h-10 flex items-center justify-center rounded-full bg-canvas-soft text-ink text-[18px] flex-shrink-0"
-          aria-label="홈으로"
-        >
-          ←
+      <nav className="sticky top-0 z-20 bg-canvas border-b border-canvas-soft px-4 md:px-8 py-4 flex items-center justify-between">
+        <div className="flex items-center gap-3 min-w-0">
+          <Link
+            href="/"
+            className="w-10 h-10 flex items-center justify-center rounded-full bg-canvas-soft text-ink text-[18px] flex-shrink-0"
+            aria-label="뒤로"
+          >
+            ←
+          </Link>
+          <h1 className="text-[20px] font-bold leading-[28px] text-ink truncate">{sido} {sigungu}</h1>
+        </div>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <Link href="/" aria-label="홈으로" className="flex-shrink-0 ml-3">
+          <img src="/icon_home.svg" alt="홈으로" width="24" height="24" />
         </Link>
-        <h1 className="text-[20px] font-bold leading-[28px] text-ink truncate">{sido} {sigungu}</h1>
       </nav>
 
       <CandidateListClient

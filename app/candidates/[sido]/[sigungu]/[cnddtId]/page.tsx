@@ -34,11 +34,17 @@ export default async function CandidateDetailPage({
     <div className="flex flex-col min-h-screen bg-canvas">
 
       {/* ── Nav bar ── */}
-      <nav className="sticky top-0 z-20 bg-canvas border-b border-canvas-soft px-4 md:px-8 py-4 flex items-center gap-3">
-        <BackButton />
-        <h1 className="text-[20px] font-bold leading-[28px] text-ink truncate">
-          {candidate.name}
-        </h1>
+      <nav className="sticky top-0 z-20 bg-canvas border-b border-canvas-soft px-4 md:px-8 py-4 flex items-center justify-between">
+        <div className="flex items-center gap-3 min-w-0">
+          <BackButton />
+          <h1 className="text-[20px] font-bold leading-[28px] text-ink truncate">
+            {candidate.name}
+          </h1>
+        </div>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <Link href="/" aria-label="홈으로" className="flex-shrink-0 ml-3">
+          <img src="/icon_home.svg" alt="홈으로" width="24" height="24" />
+        </Link>
       </nav>
 
       {/* ── Profile section ── */}
@@ -151,7 +157,7 @@ export default async function CandidateDetailPage({
             href={`${listUrl}?compare=${cnddtId}&sgTypecode=${sgTypecode}`}
             className="block w-full text-center bg-primary text-on-dark text-[16px] font-medium leading-[20px] py-4 rounded-full"
           >
-            이 후보와 비교하기
+            다른 후보와 비교하기
           </Link>
         </div>
       </div>

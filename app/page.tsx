@@ -1,5 +1,6 @@
 import RegionSelect from './components/RegionSelect';
 import FloatingButton from './components/FloatingButton';
+import LogoRain from './components/LogoRain';
 
 function getDday(): number {
   const election = new Date('2026-06-03T00:00:00+09:00');
@@ -18,14 +19,8 @@ export default function HomePage() {
       <section className="bg-canvas flex-1 px-4 py-6 md:px-8 md:py-10">
         <div className="max-w-[1200px] mx-auto">
 
-          {/* Logo + subtitle */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo.svg" alt="6.3 선거 포켓북" height="44" className="w-auto" />
-          <p
-            className="text-[12px] font-normal leading-[20px]"
-            style={{ color: '#5e5e5e', marginTop: '4px' }}
-          >
-          </p>
+          {/* Logo */}
+          <LogoRain />
 
           {/* D-day pill */}
           <div style={{ marginTop: '20px' }}>
