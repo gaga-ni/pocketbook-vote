@@ -270,7 +270,7 @@ function CandidateHeaderCol({
         </div>
 
         {/* Photo */}
-        <div className="w-full aspect-[4/3] rounded-xl overflow-hidden">
+        <div className="w-full aspect-[3/4] rounded-xl overflow-hidden">
           <CandidatePhoto
             huboid={candidate.huboid}
             sdName={candidate.sdName}

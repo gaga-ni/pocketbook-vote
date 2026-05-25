@@ -1,4 +1,5 @@
 import RegionSelect from './components/RegionSelect';
+import FloatingButton from './components/FloatingButton';
 
 function getDday(): number {
   const election = new Date('2026-06-03T00:00:00+09:00');
@@ -55,29 +56,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── Black promo band ── */}
-      <section className="bg-primary text-on-dark px-4 py-8 md:px-8 md:py-12">
-        <div className="max-w-[1200px] mx-auto">
-          <h2 className="text-[18px] font-bold leading-[32px] mb-3">
-            아직 투표가 서툰 당신을 위해
-          </h2>
-          <p className="text-[14px] font-normal leading-[24px] text-mute">
-            우리동네 후보자들의 공약을 한 눈에 비교하세요.
-            나의 소중한 한 표가 우리 동네를 바꿉니다.
-          </p>
-        </div>
-      </section>
 
-      {/* ── Footer ── */}
-      <footer className="bg-primary text-on-dark px-4 py-8 md:px-8 border-t border-black-elevated">
-        <div className="max-w-[1200px] mx-auto flex flex-col gap-1">
-          <p className="text-[14px] font-normal leading-[20px]">6.3 선거 포켓북</p>
-          <p className="text-[12px] font-normal leading-[20px] text-mute">
-            2026년 6월 3일 제9회 전국동시지방선거
-          </p>
-        </div>
-      </footer>
-
+    <FloatingButton />
     </div>
   );
 }
