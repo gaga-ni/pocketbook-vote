@@ -31,3 +31,19 @@ body {
     display: none;
   }
 }
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    #efefef 45%,
+    #e0e0e0 57%,
+    #efefef 93%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 3.0s ease infinite;
+}

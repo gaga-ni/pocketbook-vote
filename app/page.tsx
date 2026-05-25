@@ -15,7 +15,7 @@ export default function HomePage() {
     <div className="flex flex-col min-h-screen">
 
       {/* ── Hero ── */}
-      <section className="bg-canvas flex-1 px-4 py-8 md:px-8 md:py-16">
+      <section className="bg-canvas flex-1 px-4 py-6 md:px-8 md:py-10">
         <div className="max-w-[1200px] mx-auto">
 
           {/* Logo + subtitle */}
@@ -28,7 +28,7 @@ export default function HomePage() {
           </p>
 
           {/* D-day pill */}
-          <div style={{ marginTop: '30px' }}>
+          <div style={{ marginTop: '16px' }}>
             <span
               className="inline-flex items-center rounded-full text-on-dark text-[14px] font-medium leading-[16px]"
               style={{ background: '#000000', padding: '6px 12px' }}
@@ -40,7 +40,7 @@ export default function HomePage() {
           {/* Main headline */}
           <h1
             className="text-[22px] font-bold leading-[32px] text-ink"
-            style={{ marginTop: '10px', marginBottom: '20px' }}
+            style={{ marginTop: '8px', marginBottom: '12px' }}
           >
             우리 동네 후보자 공약, 한 눈에 비교하세요.
           </h1>

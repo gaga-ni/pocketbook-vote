@@ -1,10 +1,24 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
 export default function FloatingButton() {
   const [showToast, setShowToast] = useState(false);
+  const [isFooterVisible, setIsFooterVisible] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    const footer = document.querySelector('footer');
+    if (!footer) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsFooterVisible(entry.isIntersecting),
+      { threshold: 0.1 }
+    );
+
+    observer.observe(footer);
+    return () => observer.disconnect();
+  }, []);
 
   function handleClick() {
     if (timerRef.current) clearTimeout(timerRef.current);
@@ -53,24 +67,20 @@ export default function FloatingButton() {
       </div>
 
       {/* Floating button */}
-      <button
-        onClick={handleClick}
-        aria-label="투표 인증서"
-        style={{
-          position: 'fixed',
-          bottom: '24px',
-          right: '24px',
-          zIndex: 50,
-          background: 'none',
-          border: 'none',
-          padding: 0,
-          cursor: 'pointer',
-        }}
-        className="md:bottom-8 md:right-8"
+      <div
+        className={`fixed bottom-6 right-6 md:bottom-8 md:right-8 z-50 transition-opacity duration-300 ${
+          isFooterVisible ? 'opacity-0 pointer-events-none' : 'opacity-100'
+        }`}
       >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/button_floating.svg" alt="투표 인증서" width="64" height="64" className="wiggle-button" />
-      </button>
+        <button
+          onClick={handleClick}
+          aria-label="투표 인증서"
+          style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/button_floating.svg" alt="투표 인증서" width="64" height="64" className="wiggle-button" />
+        </button>
+      </div>
     </>
   );
 }

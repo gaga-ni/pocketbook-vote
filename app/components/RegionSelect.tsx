@@ -61,7 +61,7 @@ export default function RegionSelect() {
   const canConfirm = selectedSido !== null && selectedSigungu !== null;
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-2">
       <p className="text-[16px] font-medium leading-[20px] text-ink">내 지역 선택하기</p>
 
       {/* Step 1: 시도 */}
