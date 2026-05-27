@@ -61,22 +61,39 @@ export async function fetchPledges(
 export async function fetchSigungu(
   sido: string
 ): Promise<Record<string, unknown>[]> {
-  const qs =
-    `serviceKey=${serviceKey()}` +
-    `&sgId=20260603` +
-    `&sgTypecode=4` +
-    `&sdName=${encodeURIComponent(sido)}` +
-    `&numOfRows=300`;
+  const allItems: Record<string, unknown>[] = [];
+  let pageNo = 1;
+
   try {
-    const res = await fetch(
-      `${BASE}/CommonCodeService/getCommonSggCodeList?${qs}`,
-      { cache: 'no-store' }
-    );
-    if (!res.ok) return [];
-    const xml = await res.text();
-    const parsed = xmlParser.parse(xml);
-    return parsed?.response?.body?.items?.item ?? [];
+    while (true) {
+      const qs =
+        `serviceKey=${serviceKey()}` +
+        `&sgId=20260603` +
+        `&sgTypecode=4` +
+        `&sdName=${encodeURIComponent(sido)}` +
+        `&numOfRows=100` +
+        `&pageNo=${pageNo}`;
+
+      const res = await fetch(
+        `${BASE}/CommonCodeService/getCommonSggCodeList?${qs}`,
+        { cache: 'no-store' }
+      );
+      if (!res.ok) break;
+
+      const xml = await res.text();
+      const parsed = xmlParser.parse(xml);
+      const items: Record<string, unknown>[] = parsed?.response?.body?.items?.item ?? [];
+      if (items.length === 0) break;
+
+      allItems.push(...items);
+
+      const totalCount = Number(parsed?.response?.body?.totalCount ?? 0);
+      if (pageNo * 100 >= totalCount) break;
+      pageNo++;
+    }
   } catch {
-    return [];
+    // return whatever was collected before the error
   }
+
+  return allItems;
 }
