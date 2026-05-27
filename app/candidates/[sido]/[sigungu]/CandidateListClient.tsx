@@ -280,6 +280,7 @@ function CandidateCard({
           huboid={candidate.huboid}
           sdName={candidate.sdName}
           sgTypecode={candidate.sgTypecode}
+          sggName={candidate.sggName}
           name={candidate.name}
           className="w-full h-full"
           priority={priority}

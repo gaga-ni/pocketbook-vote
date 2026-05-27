@@ -7,15 +7,16 @@ interface Props {
   huboid: string;
   sdName: string;
   sgTypecode: string;
+  sggName?: string;
   name: string;
 }
 
-export default function ProfilePhotoSection({ huboid, sdName, sgTypecode, name }: Props) {
+export default function ProfilePhotoSection({ huboid, sdName, sgTypecode, sggName, name }: Props) {
   const [error, setError] = useState(false);
 
   if (error || !huboid) return null;
 
-  const photoUrl = getCandidatePhotoUrl(huboid, sdName, sgTypecode);
+  const photoUrl = getCandidatePhotoUrl(huboid, sdName, sgTypecode, sggName);
 
   return (
     <div className="w-32 flex-shrink-0 py-2">

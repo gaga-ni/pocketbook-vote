@@ -7,6 +7,7 @@ interface Props {
   huboid: string;
   sdName: string;
   sgTypecode: string;
+  sggName?: string;
   name: string;
   className?: string;
   hideOnError?: boolean;
@@ -32,6 +33,7 @@ export default function CandidatePhoto({
   huboid,
   sdName,
   sgTypecode,
+  sggName,
   name,
   className = '',
   hideOnError = false,
@@ -50,7 +52,7 @@ export default function CandidatePhoto({
     return <DefaultPlaceholder className={className} hideOnError={hideOnError} />;
   }
 
-  const photoUrl = getCandidatePhotoUrl(huboid, sdName, sgTypecode);
+  const photoUrl = getCandidatePhotoUrl(huboid, sdName, sgTypecode, sggName);
 
   return (
     <div className={`relative ${className}`}>

@@ -75,6 +75,7 @@ export default async function CandidateDetailPage({
             huboid={candidate.huboid}
             sdName={candidate.sdName}
             sgTypecode={candidate.sgTypecode}
+            sggName={candidate.sggName}
             name={candidate.name}
           />
         </div>

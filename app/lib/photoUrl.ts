@@ -21,10 +21,12 @@ const SIDO_CODES: Record<string, string> = {
 export function getCandidatePhotoUrl(
   huboid: string,
   sdName: string,
-  sgTypecode: string
+  sgTypecode: string,
+  sggName?: string
 ): string {
   const sidoCode = SIDO_CODES[sdName] ?? '11';
-  const suffix = sgTypecode === '4' ? '01' : '00';
-  const gsgCode = sidoCode + suffix;
-  return `/api/photo?huboid=${huboid}&gsgCode=${gsgCode}`;
+  const gsgCode = sidoCode + '00';
+  let url = `/api/photo?huboid=${huboid}&gsgCode=${gsgCode}&sdName=${encodeURIComponent(sdName)}`;
+  if (sggName) url += `&sggName=${encodeURIComponent(sggName)}`;
+  return url;
 }
