@@ -63,7 +63,7 @@ export default function FloatingButton() {
         }}
         aria-live="polite"
       >
-        준비 중이에요! 5.29 사전 투표 날 만나요 😊
+        준비 중이에요! 6.3 선거날에 만나요 🗳️
       </div>
 
       {/* Floating button */}
